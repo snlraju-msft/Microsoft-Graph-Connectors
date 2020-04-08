@@ -1,0 +1,667 @@
+openapi: 3.0.0
+info:
+  title: Microsoft Graph Connectors
+  version: '1.0'
+  contact:
+    name: '@snlraju'
+    email: rajun@microsoft.com
+  termsOfService: 'https://docs.microsoft.com/en-us/legal/microsoft-apis/terms-of-use'
+servers:
+  - url: 'https://graph.microsoft.com/beta/external'
+    description: Beta
+  - url: 'http://localhost:3000'
+    description: Internal
+paths:
+  /connections:
+    get:
+      summary: List all connections
+      tags:
+        - Connection
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  title: connection
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      minLength: 1
+                      maxLength: 32
+                      pattern: '^[A-Za-z0-9]+'
+                    name:
+                      type: string
+                      minLength: 1
+                      maxLength: 64
+                    description:
+                      type: string
+                      minLength: 0
+                      maxLength: 512
+                    configuration:
+                      type: object
+                      properties:
+                        authorizedApps:
+                          type: array
+                          items:
+                            type: string
+                  required:
+                    - id
+                    - name
+      operationId: get-external-connections
+    post:
+      summary: Create a connection
+      operationId: post-external-connections
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: connection
+              type: object
+              properties:
+                id:
+                  type: string
+                  minLength: 1
+                  maxLength: 32
+                  pattern: '^[A-Za-z0-9]+'
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 64
+                description:
+                  type: string
+                  minLength: 0
+                  maxLength: 512
+                configuration:
+                  type: object
+                  properties:
+                    authorizedApps:
+                      type: array
+                      items:
+                        type: string
+              required:
+                - id
+                - name
+      tags:
+        - Connection
+    parameters: []
+  '/connections/{connectionId}':
+    parameters:
+      - schema:
+          type: string
+        name: connectionId
+        in: path
+        required: true
+    patch:
+      summary: Update a connection
+      operationId: patch-external-connections-connectionId
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: connection
+              type: object
+              properties:
+                id:
+                  type: string
+                  minLength: 1
+                  maxLength: 32
+                  pattern: '^[A-Za-z0-9]+'
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 64
+                description:
+                  type: string
+                  minLength: 0
+                  maxLength: 512
+                configuration:
+                  type: object
+                  properties:
+                    authorizedApps:
+                      type: array
+                      items:
+                        type: string
+              required:
+                - id
+                - name
+        description: ''
+      tags:
+        - Connection
+    delete:
+      summary: Delete a connection
+      operationId: delete-external-connections-connectionId
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Connection
+    get:
+      summary: Get a connection
+      operationId: get-external-connections-connectionId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: connection
+                type: object
+                properties:
+                  id:
+                    type: string
+                    minLength: 1
+                    maxLength: 32
+                    pattern: '^[A-Za-z0-9]+'
+                  name:
+                    type: string
+                    minLength: 1
+                    maxLength: 64
+                  description:
+                    type: string
+                    minLength: 0
+                    maxLength: 512
+                  configuration:
+                    type: object
+                    properties:
+                      authorizedApps:
+                        type: array
+                        items:
+                          type: string
+                required:
+                  - id
+                  - name
+      tags:
+        - Connection
+  '/connections/{connectionId}/schema':
+    parameters:
+      - schema:
+          type: string
+        name: connectionId
+        in: path
+        required: true
+    get:
+      summary: Get connection schema
+      tags:
+        - Schema
+      responses:
+        '200':
+          description: OK
+          headers: {}
+      operationId: get-external-connections-connectionId-schema
+    post:
+      summary: Set connection schema
+      operationId: post-external-connections-connectionId-schema
+      responses:
+        '200':
+          description: OK
+          headers: {}
+        '202':
+          description: Accepted
+          headers:
+            location:
+              schema:
+                type: string
+              required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              maxItems: 128
+              minItems: 0
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  isSearchable:
+                    type: boolean
+                  isQueryable:
+                    type: boolean
+                  isRetrievable:
+                    type: boolean
+                  isRefinable:
+                    type: boolean
+                  isSortable:
+                    type: boolean
+                  aliases:
+                    type: array
+                    maxItems: 5
+                    minItems: 0
+                    items:
+                      type: string
+                  labels:
+                    type: array
+                    maxItems: 1
+                    minItems: 0
+                    items:
+                      type: string
+        description: ''
+      tags:
+        - Schema
+  '/connections/{connectionId}/items/{itemId}':
+    parameters:
+      - schema:
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: alphanumeric
+        name: connectionId
+        in: path
+        required: true
+      - schema:
+          type: string
+          maxLength: 128
+          minLength: 1
+          pattern: URL safe base64
+        name: itemId
+        in: path
+        required: true
+    get:
+      summary: Get an item
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: item
+                type: object
+                properties:
+                  acl:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                            - user
+                            - group
+                            - Everyone
+                            - EveryoneExceptGuests
+                        value:
+                          type: string
+                        accessType:
+                          type: string
+                        identitySource:
+                          type: string
+                      required:
+                        - type
+                        - value
+                  properties:
+                    type: object
+                  content:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - text
+                          - html
+                          - unknownFutureValue
+                      value:
+                        type: string
+                  id:
+                    type: string
+                    minLength: 1
+                    maxLength: 128
+                    pattern: '^[A-Za-z0-9-_]+'
+      operationId: get-external-connections-connectionId-items-itemId
+      tags:
+        - Items
+    put:
+      summary: Upsert an item
+      operationId: put-external-connections-connectionId-items-itemId
+      responses:
+        '200':
+          description: OK
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: item
+              type: object
+              properties:
+                acl:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - user
+                          - group
+                          - Everyone
+                          - EveryoneExceptGuests
+                      value:
+                        type: string
+                      accessType:
+                        type: string
+                      identitySource:
+                        type: string
+                    required:
+                      - type
+                      - value
+                properties:
+                  type: object
+                content:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - text
+                        - html
+                        - unknownFutureValue
+                    value:
+                      type: string
+                id:
+                  type: string
+                  minLength: 1
+                  maxLength: 128
+                  pattern: '^[A-Za-z0-9-_]+'
+      tags:
+        - Items
+    patch:
+      summary: Partially update an item
+      operationId: patch-external-connections-connectionId-items-itemId
+      responses:
+        '200':
+          description: OK
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: item
+              type: object
+              properties:
+                acl:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - user
+                          - group
+                          - Everyone
+                          - EveryoneExceptGuests
+                      value:
+                        type: string
+                      accessType:
+                        type: string
+                      identitySource:
+                        type: string
+                    required:
+                      - type
+                      - value
+                properties:
+                  type: object
+                content:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                        - text
+                        - html
+                        - unknownFutureValue
+                    value:
+                      type: string
+                id:
+                  type: string
+                  minLength: 1
+                  maxLength: 128
+                  pattern: '^[A-Za-z0-9-_]+'
+      tags:
+        - Items
+    delete:
+      summary: Delete an item
+      operationId: delete-external-connections-connectionId-items-itemId
+      responses:
+        '200':
+          description: OK
+      tags:
+        - Items
+  '/connections/{connectionId}/operations/{operationId}':
+    parameters:
+      - schema:
+          type: string
+        name: connectionId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: operationId
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags:
+        - Schema
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                title: operation
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    enum:
+                      - inprogress
+                      - completed
+                      - failed
+                  error:
+                    type: string
+                required:
+                  - id
+                  - status
+components:
+  schemas:
+    connection:
+      title: connection
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: '^[A-Za-z0-9]+'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+          minLength: 0
+          maxLength: 512
+        configuration:
+          type: object
+          properties:
+            authorizedApps:
+              type: array
+              items:
+                type: string
+      required:
+        - id
+        - name
+    schema:
+      type: array
+      title: schema
+      uniqueItems: true
+      maxItems: 128
+      minItems: 0
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          type:
+            type: string
+          isSearchable:
+            type: boolean
+          isQueryable:
+            type: boolean
+          isRetrievable:
+            type: boolean
+          isRefinable:
+            type: boolean
+          isSortable:
+            type: boolean
+          aliases:
+            type: array
+            uniqueItems: true
+            maxItems: 5
+            minItems: 0
+            items:
+              type: string
+          labels:
+            type: array
+            enum:
+              - title
+              - url
+              - createdBy
+              - lastModifiedBy
+              - authors
+              - createdDateTime
+              - lastModifiedTime
+              - fileName
+              - fileExtension
+              - unknownFutureValue
+            maxItems: 1
+            minItems: 0
+            items:
+              type: string
+        required:
+          - name
+          - type
+    item:
+      title: item
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: '^[A-Za-z0-9-_]+'
+        acl:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                  - user
+                  - group
+                  - Everyone
+                  - EveryoneExceptGuests
+              value:
+                type: string
+              accessType:
+                type: string
+              identitySource:
+                type: string
+            required:
+              - type
+              - value
+        properties:
+          type: object
+        content:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - text
+                - html
+                - unknownFutureValue
+            value:
+              type: string
+    operation:
+      title: operation
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - inprogress
+            - completed
+            - failed
+        error:
+          type: string
+      required:
+        - id
+        - status
+    error:
+      title: error
+      type: object
+      properties:
+        code:
+          type: string
+          enum:
+            - Unauthenticated
+            - AccessDenied
+            - GeneralException
+            - ServiceNotAvailable
+            - InvalidRequest
+            - ItemNotFound
+            - NameAlreadyExists
+            - ActivityLimitReached
+            - QuotaLimitReached
+            - NotAllowed
+            - NotSupported
+            - PreconditionNotMet
+            - InvalidRange
+        message:
+          type: string
+        innerError:
+          type: object
+          properties:
+            code:
+              type: string
+            source:
+              type: string
+            message:
+              type: string
+      required:
+        - code
+        - message
+  securitySchemes:
+    Authorization:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: ''
+          refreshUrl: ''
+          scopes:
+            ExternalItem.ReadWrite.All: Allows the application to create and manage Microsoft Graph connections and content without a signed-in user.
